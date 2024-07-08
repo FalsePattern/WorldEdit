@@ -19,7 +19,6 @@
 
 package com.sk89q.worldedit.extent.clipboard.io;
 
-import com.sk89q.jnbt.ByteArrayTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.DoubleTag;
 import com.sk89q.jnbt.FloatTag;
@@ -35,8 +34,7 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.regions.Region;
-import com.sk89q.worldedit.util.FlatNibbleArray;
-import com.sk89q.worldedit.util.SerializationUtil;
+import com.sk89q.worldedit.util.serialization.SerializationUtil;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.registry.WorldData;
 import lombok.val;

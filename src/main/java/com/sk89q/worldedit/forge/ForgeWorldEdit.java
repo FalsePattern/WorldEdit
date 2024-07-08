@@ -52,7 +52,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
-import com.sk89q.worldedit.util.SerializationUtil;
+import com.sk89q.worldedit.util.serialization.SerializationUtil;
+import com.sk89q.worldedit.util.serialization.remapping.RemappingBlockIOFactory;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -86,7 +87,7 @@ public class ForgeWorldEdit {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        SerializationUtil.register(ForgeMappingProvider::new, 0);
+        SerializationUtil.registerConstructor(() -> new RemappingBlockIOFactory(ForgeMappingProvider::new), 0);
         logger = event.getModLog();
         // Setup working directory
         workingDir = new File(event.getModConfigurationDirectory() + File.separator + "worldedit");
