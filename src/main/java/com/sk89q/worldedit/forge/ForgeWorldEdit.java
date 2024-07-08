@@ -51,6 +51,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CommandEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+
+import com.sk89q.worldedit.util.IDMapping;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -84,6 +86,7 @@ public class ForgeWorldEdit {
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        IDMapping.register(ForgeMappingProvider::new, 0);
         logger = event.getModLog();
         // Setup working directory
         workingDir = new File(event.getModConfigurationDirectory() + File.separator + "worldedit");

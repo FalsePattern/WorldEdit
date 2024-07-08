@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.extent.clipboard.io;
 
 import com.sk89q.jnbt.ByteArrayTag;
+import com.sk89q.jnbt.ByteTag;
 import com.sk89q.jnbt.CompoundTag;
 import com.sk89q.jnbt.IntTag;
 import com.sk89q.jnbt.ListTag;
@@ -37,6 +38,8 @@ import com.sk89q.worldedit.extent.clipboard.BlockArrayClipboard;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
+import com.sk89q.worldedit.util.FlatNibbleArray;
+import com.sk89q.worldedit.util.IDMapping;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.registry.WorldData;
 import com.sk89q.worldedit.world.storage.NBTConversions;
@@ -48,6 +51,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import lombok.val;
+import lombok.var;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -127,24 +133,65 @@ public class SchematicReader implements ClipboardReader {
         // Get blocks
         byte[] blockId = requireTag(schematic, "Blocks", ByteArrayTag.class).getValue();
         byte[] blockData = requireTag(schematic, "Data", ByteArrayTag.class).getValue();
-        byte[] addId = new byte[0];
-        short[] blocks = new short[blockId.length]; // Have to later combine IDs
+        FlatNibbleArray addId = null;
+        int[] blocks = new int[blockId.length]; // Have to later combine IDs
 
         // We support 4096 block IDs using the same method as vanilla Minecraft, where
         // the highest 4 bits are stored in a separate byte array.
-        if (schematic.containsKey("AddBlocks")) {
-            addId = requireTag(schematic, "AddBlocks", ByteArrayTag.class).getValue();
+        String addBlocksKey;
+        if (schematic.containsKey("Add"))
+            addBlocksKey = "Add";
+        else if (schematic.containsKey("AddBlocks"))
+            addBlocksKey = "AddBlocks";
+        else
+            addBlocksKey = null;
+        if (addBlocksKey != null) {
+            addId = new FlatNibbleArray(requireTag(schematic, addBlocksKey, ByteArrayTag.class).getValue());
         }
 
         // Combine the AddBlocks data with the first 8-bit block ID
         for (int index = 0; index < blockId.length; index++) {
-            if ((index >> 1) >= addId.length) { // No corresponding AddBlocks index
-                blocks[index] = (short) (blockId[index] & 0xFF);
+            if (addId == null) {
+                blocks[index] = blockId[index] & 0xFF;
             } else {
-                if ((index & 1) == 0) {
-                    blocks[index] = (short) (((addId[index >> 1] & 0x0F) << 8) + (blockId[index] & 0xFF));
+                blocks[index] = (blockId[index] & 0xFF) | (addId.get(index) << 8);
+            }
+        }
+
+        String idMapKey;
+        if (schematic.containsKey("IDMap"))
+            idMapKey = "IDMap";
+        else if (schematic.containsKey("SchematicaMapping"))
+            idMapKey = "SchematicaMapping";
+        else
+            idMapKey = null;
+
+        // ID remapping
+        if (idMapKey != null) {
+            val mapping = IDMapping.create();
+            val idMap = requireTag(schematic, idMapKey, CompoundTag.class).getValue();
+            for (val entry: idMap.entrySet()) {
+                val name = entry.getKey();
+                val nbtEntry = entry.getValue();
+                int originalID;
+                if (nbtEntry instanceof IntTag) {
+                    originalID = ((IntTag)nbtEntry).getValue();
+                } else if (nbtEntry instanceof ShortTag) {
+                    originalID = ((ShortTag)nbtEntry).getValue() & 0xFFFF;
+                } else if (nbtEntry instanceof ByteTag) {
+                    originalID = ((ByteTag)nbtEntry).getValue() & 0xFF;
                 } else {
-                    blocks[index] = (short) (((addId[index >> 1] & 0xF0) << 4) + (blockId[index] & 0xFF));
+                    originalID = 0;
+                }
+                var blockID = mapping.getIDFromName(name);
+                if (blockID == -1 || (blockID == 0 && originalID != 0)) {
+                    log.log(Level.WARNING, "Missing ID mapping for " + name + "! Replacing with air.");
+                    blockID = 0;
+                }
+                for (int i = 0; i < blocks.length; i++) {
+                    if (blocks[i] == originalID) {
+                        blocks[i] = blockID;
+                    }
                 }
             }
         }
@@ -154,7 +201,9 @@ public class SchematicReader implements ClipboardReader {
         Map<BlockVector, Map<String, Tag>> tileEntitiesMap = new HashMap<BlockVector, Map<String, Tag>>();
 
         for (Tag tag : tileEntities) {
-            if (!(tag instanceof CompoundTag)) continue;
+            if (!(tag instanceof CompoundTag)) {
+                continue;
+            }
             CompoundTag t = (CompoundTag) tag;
 
             int x = 0;
