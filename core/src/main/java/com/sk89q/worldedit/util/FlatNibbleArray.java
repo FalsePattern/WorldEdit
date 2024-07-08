@@ -23,6 +23,8 @@ public class FlatNibbleArray {
 
     public int get(int index) {
         int idx = index >> 1;
+        if (idx < 0 || idx >= store.length)
+            return 0;
         int current;
         if ((index & 1) == 0) {
             current = store[idx] & 0x0F;

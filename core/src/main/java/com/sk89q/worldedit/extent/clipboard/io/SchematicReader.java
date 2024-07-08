@@ -39,7 +39,7 @@ import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.regions.CuboidRegion;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.FlatNibbleArray;
-import com.sk89q.worldedit.util.IDMapping;
+import com.sk89q.worldedit.util.SerializationUtil;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.registry.WorldData;
 import com.sk89q.worldedit.world.storage.NBTConversions;
@@ -130,70 +130,17 @@ public class SchematicReader implements ClipboardReader {
         // Blocks
         // ====================================================================
 
-        // Get blocks
-        byte[] blockId = requireTag(schematic, "Blocks", ByteArrayTag.class).getValue();
-        byte[] blockData = requireTag(schematic, "Data", ByteArrayTag.class).getValue();
-        FlatNibbleArray addId = null;
-        int[] blocks = new int[blockId.length]; // Have to later combine IDs
+        val mapping = SerializationUtil.create();
 
-        // We support 4096 block IDs using the same method as vanilla Minecraft, where
-        // the highest 4 bits are stored in a separate byte array.
-        String addBlocksKey;
-        if (schematic.containsKey("Add"))
-            addBlocksKey = "Add";
-        else if (schematic.containsKey("AddBlocks"))
-            addBlocksKey = "AddBlocks";
-        else
-            addBlocksKey = null;
-        if (addBlocksKey != null) {
-            addId = new FlatNibbleArray(requireTag(schematic, addBlocksKey, ByteArrayTag.class).getValue());
-        }
+        val deserializer = mapping.newBlockDeserializer(schematic);
+        int blockCount = deserializer.length();
 
-        // Combine the AddBlocks data with the first 8-bit block ID
-        for (int index = 0; index < blockId.length; index++) {
-            if (addId == null) {
-                blocks[index] = blockId[index] & 0xFF;
-            } else {
-                blocks[index] = (blockId[index] & 0xFF) | (addId.get(index) << 8);
-            }
-        }
+        int[] blocks = new int[blockCount];
+        int[] blockData = new int[blockCount];
 
-        String idMapKey;
-        if (schematic.containsKey("IDMap"))
-            idMapKey = "IDMap";
-        else if (schematic.containsKey("SchematicaMapping"))
-            idMapKey = "SchematicaMapping";
-        else
-            idMapKey = null;
-
-        // ID remapping
-        if (idMapKey != null) {
-            val mapping = IDMapping.create();
-            val idMap = requireTag(schematic, idMapKey, CompoundTag.class).getValue();
-            for (val entry: idMap.entrySet()) {
-                val name = entry.getKey();
-                val nbtEntry = entry.getValue();
-                int originalID;
-                if (nbtEntry instanceof IntTag) {
-                    originalID = ((IntTag)nbtEntry).getValue();
-                } else if (nbtEntry instanceof ShortTag) {
-                    originalID = ((ShortTag)nbtEntry).getValue() & 0xFFFF;
-                } else if (nbtEntry instanceof ByteTag) {
-                    originalID = ((ByteTag)nbtEntry).getValue() & 0xFF;
-                } else {
-                    originalID = 0;
-                }
-                var blockID = mapping.getIDFromName(name);
-                if (blockID == -1 || (blockID == 0 && originalID != 0)) {
-                    log.log(Level.WARNING, "Missing ID mapping for " + name + "! Replacing with air.");
-                    blockID = 0;
-                }
-                for (int i = 0; i < blocks.length; i++) {
-                    if (blocks[i] == originalID) {
-                        blocks[i] = blockID;
-                    }
-                }
-            }
+        for (int index = 0; index < blockCount; index++) {
+            blocks[index] = deserializer.loadBlockID(index);
+            blockData[index] = deserializer.loadBlockData(index);
         }
 
         // Need to pull out tile entities

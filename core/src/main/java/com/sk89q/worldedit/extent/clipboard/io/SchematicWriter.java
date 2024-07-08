@@ -36,7 +36,7 @@ import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.extent.clipboard.Clipboard;
 import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.util.FlatNibbleArray;
-import com.sk89q.worldedit.util.IDMapping;
+import com.sk89q.worldedit.util.SerializationUtil;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.registry.WorldData;
 import lombok.val;
@@ -108,12 +108,9 @@ public class SchematicWriter implements ClipboardWriter {
         // Block handling
         // ====================================================================
 
-        byte[] blocks = new byte[width * height * length];
-        FlatNibbleArray addBlocks = null;
-        byte[] blockData = new byte[width * height * length];
         List<Tag> tileEntities = new ArrayList<Tag>();
-        val mapping = IDMapping.create();
-        val idMap = new HashMap<Integer, String>(mapping.expectedMaxIDCount(), 0.25f);
+        val mapping = SerializationUtil.create();
+        val blockSerializer = mapping.newBlockSerializer(width * height * length);
 
         for (Vector point : region) {
             Vector relative = point.subtract(min);
@@ -124,24 +121,7 @@ public class SchematicWriter implements ClipboardWriter {
             int index = y * width * length + z * width + x;
             BaseBlock block = clipboard.getBlock(point);
 
-
-            val rawID = block.getType();
-
-            if (!idMap.containsKey(rawID)) {
-                idMap.put(rawID, mapping.getNameFromID(rawID));
-            }
-
-            // Save 4096 IDs in an AddBlocks section
-            if (rawID > 255) {
-                if (addBlocks == null) { // Lazily create section
-                    addBlocks = new FlatNibbleArray(blocks.length);
-                }
-
-                addBlocks.set(index, (rawID & 0xF00) >> 8);
-            }
-
-            blocks[index] = (byte) block.getType();
-            blockData[index] = (byte) block.getData();
+            blockSerializer.saveBlock(index, block.getType(), block.getData());
 
             // Store TileEntity data
             CompoundTag rawTag = block.getNbtData();
@@ -161,19 +141,8 @@ public class SchematicWriter implements ClipboardWriter {
             }
         }
 
-        val idMapTags = new HashMap<String, Tag>();
-        for (val idEntry: idMap.entrySet()) {
-            idMapTags.put(idEntry.getValue(), new IntTag(idEntry.getKey()));
-        }
-
-        schematic.put("SchematicaMapping", new CompoundTag(idMapTags));
-        schematic.put("Blocks", new ByteArrayTag(blocks));
-        schematic.put("Data", new ByteArrayTag(blockData));
+        blockSerializer.serialize(schematic);
         schematic.put("TileEntities", new ListTag(CompoundTag.class, tileEntities));
-
-        if (addBlocks != null) {
-            schematic.put("AddBlocks", new ByteArrayTag(addBlocks.store));
-        }
 
         // ====================================================================
         // Entities
