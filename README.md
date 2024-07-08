@@ -1,5 +1,6 @@
-![WorldEdit](http://static.sk89q.com/readme/worldedit.png)
-=========
+<h1>
+    <img src="worldedit-logo.svg" alt="WorldEdit" width="400" /> 
+</h1>
 
 WorldEdit is an easy-to-use in-game world editor for Minecraft, supporting both
 single player and multiplayer, that lets you:
@@ -13,24 +14,7 @@ single player and multiplayer, that lets you:
 WorldEdit is open source and is available under the GNU Lesser General Public
 License v3.
 
-Compiling
----------
+## Fork info
 
-See [COMPILING.md](COMPILING.md) for a guide on compiling WorldEdit.
-
-Contributing
-------------
-
-We happily accept contributions, especially through pull requests on GitHub.
-Submissions must be licensed under the GNU Lesser General Public License v3.
-
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for important guidelines to follow.
-
-Links
------
-
-* [Visit our website](http://www.enginehub.org/)
-* [IRC channel](http://skq.me/irc/irc.esper.net/sk89q/) (#sk89q on irc.esper.net)
-* [Issue tracker](http://youtrack.sk89q.com/issues/WORLDEDIT)
-* [Continuous integration](http://builds.enginehub.org) [![Build Status](https://travis-ci.org/sk89q/WorldEdit.svg?branch=master)](https://travis-ci.org/sk89q/WorldEdit)
-* [End-user documentation](http://wiki.sk89q.com/wiki/WorldEdit)
+This is a fork of WorldEdit 6.1.1 for 1.7.10, with the goal of centralizing any improvements and changes into a single location,
+removing the need for bespoke ASM and mixins from various mods that deeply change world formats, as well as integrating fixes that have been discovered over the years.

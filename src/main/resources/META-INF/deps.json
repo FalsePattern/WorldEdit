@@ -1,0 +1,31 @@
+{
+  "identifier": "falsepatternlib_dependencies",
+  "repositories": [
+    "https://repo1.maven.org/maven2/",
+    "https://maven.enginehub.org/repo/"
+  ],
+  "dependencies": {
+    "always": {
+      "common": [],
+      "client": [],
+      "server": []
+    },
+    "obf": {
+      "common": [
+        "org.mozilla:rhino:1.7.15",
+        "org.yaml:snakeyaml:1.9",
+        "de.schlichtherle:truezip:6.8.3",
+        "com.sk89q:jchronic:0.2.4a",
+        "com.thoughtworks.paranamer:paranamer:2.6",
+        "com.sk89q.lib:jlibnoise:1.0.0"
+      ],
+      "client": [],
+      "server": []
+    },
+    "dev": {
+      "common": [],
+      "client": [],
+      "server": []
+    }
+  }
+}
