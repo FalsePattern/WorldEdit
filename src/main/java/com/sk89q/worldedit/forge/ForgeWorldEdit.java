@@ -131,6 +131,7 @@ public class ForgeWorldEdit {
     @EventHandler
     public void serverStopping(FMLServerStoppingEvent event) {
         WorldEdit.getInstance().getPlatformManager().unregister(platform);
+        platform = null;
     }
 
     @EventHandler
