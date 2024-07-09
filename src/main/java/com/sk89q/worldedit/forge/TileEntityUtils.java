@@ -55,36 +55,6 @@ final class TileEntityUtils {
 
         return tag;
     }
-
-    /**
-     * Set a tile entity at the given location.
-     *
-     * @param world the world
-     * @param position the position
-     * @param clazz the tile entity class
-     * @param tag the tag for the tile entity (may be null to not set NBT data)
-     */
-    static void setTileEntity(World world, Vector position, Class<? extends TileEntity> clazz, @Nullable NBTTagCompound tag) {
-        checkNotNull(world);
-        checkNotNull(position);
-        checkNotNull(clazz);
-
-        TileEntity tileEntity = constructTileEntity(world, position, clazz);
-
-        if (tileEntity == null) {
-            return;
-        }
-
-        if (tag != null) {
-            // Set X, Y, Z
-            updateForSet(tag, position);
-            tileEntity.readFromNBT(tag);
-        }
-
-        tileEntity = ForgeWorldEdit.inst.getFMPCompat().overrideTileEntity(world, tag, tileEntity);
-
-        setTileEntity(world, position, tileEntity);
-    }
     /**
      * Set a tile entity at the given location using the tile entity ID from
      * the tag.
@@ -116,42 +86,4 @@ final class TileEntityUtils {
                 position.getBlockZ(), tileEntity);
         ForgeWorldEdit.inst.getFMPCompat().sendDescPacket(world, tileEntity);
     }
-
-    /**
-     * Construct a tile entity from the given class.
-     *
-     * @param world the world
-     * @param position the position
-     * @param clazz the class
-     * @return a tile entity (may be null if it failed)
-     */
-    @Nullable
-    static TileEntity constructTileEntity(World world, Vector position, Class<? extends TileEntity> clazz) {
-        Constructor<? extends TileEntity> baseConstructor;
-        try {
-            baseConstructor = clazz.getConstructor(); // creates "blank" TE
-        } catch (Throwable e) {
-            return null; // every TE *should* have this constructor, so this isn't necessary
-        }
-
-        TileEntity genericTE;
-        try {
-            // Downcast here for return while retaining the type
-            genericTE = (TileEntity) baseConstructor.newInstance();
-        } catch (Throwable e) {
-            return null;
-        }
-
-        /*
-        genericTE.blockType = Block.blocksList[block.getId()];
-        genericTE.blockMetadata = block.getData();
-        genericTE.xCoord = pt.getBlockX();
-        genericTE.yCoord = pt.getBlockY();
-        genericTE.zCoord = pt.getBlockZ();
-        genericTE.worldObj = world;
-        */ // handled by internal code
-
-        return genericTE;
-    }
-
 }

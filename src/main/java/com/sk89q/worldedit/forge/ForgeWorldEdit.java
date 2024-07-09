@@ -84,7 +84,7 @@ public class ForgeWorldEdit {
     private ForgePlatform platform;
     private ForgeConfiguration config;
     private File workingDir;
-    private ForgeMultipartCompat compat = new NoForgeMultipartCompat();
+    private ForgeMultipartCompat fmpCompat = new NoForgeMultipartCompat();
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
@@ -98,7 +98,8 @@ public class ForgeWorldEdit {
         config.load();
 
         if (Loader.isModLoaded("ForgeMultipart")) {
-            compat = new ForgeMultipartExistsCompat();
+            fmpCompat = new ForgeMultipartExistsCompat();
+            ForgeWorldData.getInstance().addBlockTransformHook((ForgeMultipartExistsCompat) fmpCompat);
         }
         if (Loader.isModLoaded("ArchitectureCraft")) {
             ForgeWorldData.getInstance().addBlockTransformHook(new ArchitectureCraftBlockTransformHook());
@@ -279,7 +280,7 @@ public class ForgeWorldEdit {
     }
 
     public ForgeMultipartCompat getFMPCompat() {
-        return compat;
+        return fmpCompat;
     }
 
     /**
