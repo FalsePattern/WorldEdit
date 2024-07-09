@@ -1,3 +1,20 @@
+--- FORK CHANGELOG ---
+
+6.2.0
+- Added support for Schematica .schematic files, without the need for conversion
+  (can still load old schematics from worldedit)
+- Newly exported schematics now follow schematica specification
+- Improved compatibility with Forge Multipart
+- Added compatibility patches for ArchitectureCraft and Carpenter's Blocks
+- Fixed some slight memory leaks
+- Fixed an occasional ClassCastException crash
+- Fake Players can no longer trigger worldedit with the wand item (wooden hammer in right clicker machine)
+- (experimental) API for custom block ID saving logic. Not finalized yet,
+  do not use.
+
+
+--- ORIGINAL WORLDEDIT CHANGELOG ---
+
 6.1
 - Added support for Spigot for MC 1.8.3 to 1.8.6.
 - Added rotation values to lit redstone torches.
@@ -228,7 +245,7 @@ Thanks for the contributions from aumgn
 - Removed chat-based WECUI protocol (now replaced with packet 250).
 
 Thank you for the contributions from Ammar Askar (ammaraskar), aumgn,
-Jim Nordbø (Silentspy), snaxson, Socolin, and Zhuowei Zhang (zhuowei).
+Jim Nordbï¿½ (Silentspy), snaxson, Socolin, and Zhuowei Zhang (zhuowei).
 
 5.3:
 - Made #region mask keep the region selected when the pask was added, and
