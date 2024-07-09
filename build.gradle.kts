@@ -76,3 +76,9 @@ dependencies {
 
     runtimeOnlyNonPublishable("codechicken:notenoughitems-mc1.7.10:2.3.1-mega:dev")
 }
+
+afterEvaluate {
+    tasks.named<Jar>("sourcesJar").configure {
+        from(project(":core").sourceSets["main"].allSource)
+    }
+}
