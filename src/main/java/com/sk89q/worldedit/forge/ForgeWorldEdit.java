@@ -66,7 +66,12 @@ import static net.minecraftforge.event.entity.player.PlayerInteractEvent.Action;
 /**
  * The Forge implementation of WorldEdit.
  */
-@Mod(modid = ForgeWorldEdit.MOD_ID, name = "WorldEdit", version = Tags.MOD_VERSION, acceptableRemoteVersions = "*")
+@Mod(modid = ForgeWorldEdit.MOD_ID,
+     name = "WorldEdit",
+     version = Tags.MOD_VERSION,
+     acceptableRemoteVersions = "*",
+     dependencies = "after:ForgeMultipart;after:ArchitectureCraft"
+     )
 public class ForgeWorldEdit {
 
     public static Logger logger;
