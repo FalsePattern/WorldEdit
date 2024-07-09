@@ -56,6 +56,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 import com.sk89q.worldedit.util.serialization.SerializationUtil;
 import com.sk89q.worldedit.util.serialization.remapping.RemappingBlockIOFactory;
+import lombok.val;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
@@ -178,8 +179,12 @@ public class ForgeWorldEdit {
         if (event.useItem == Result.DENY || event.entity.worldObj.isRemote) return;
 
         WorldEdit we = WorldEdit.getInstance();
-        ForgePlayer player = wrap((EntityPlayerMP) event.entityPlayer);
-        ForgeWorld world = getWorld(event.entityPlayer.worldObj);
+        if (!(event.entityPlayer instanceof EntityPlayerMP))
+            return;
+        val playerMP = (EntityPlayerMP) event.entityPlayer;
+
+        ForgePlayer player = wrap(playerMP);
+        ForgeWorld world = getWorld(playerMP.worldObj);
 
         Action action = event.action;
         switch (action) {
