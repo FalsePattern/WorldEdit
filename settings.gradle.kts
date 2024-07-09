@@ -28,6 +28,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "worldedit-refreshed"
+rootProject.name = "WorldEdit"
 
 include("core")
