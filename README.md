@@ -19,6 +19,8 @@ License v3.
 This is a fork of WorldEdit 6.1.1 for 1.7.10, with the goal of centralizing any improvements and changes into a single location,
 removing the need for bespoke ASM and mixins from various mods that deeply change world formats, as well as integrating fixes that have been discovered over the years.
 
+Some bugfixes and compat patches have been merged in from the [nh fork](https://github.com/GTNewHorizons/worldedit-gtnh)
+
 ## Dependencies
 
 - [FalsePatternLib](https://github.com/FalsePattern/FalsePatternLib)
