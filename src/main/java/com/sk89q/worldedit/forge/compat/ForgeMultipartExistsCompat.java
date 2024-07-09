@@ -89,11 +89,9 @@ public class ForgeMultipartExistsCompat implements ForgeMultipartCompat, BlockTr
         }
         if (rot.getX() < 0) {
             int ticks = (int) Math.round(rot.getX() / 90);
-            System.out.println("X rotation currently unsupported");
         }
         if (rot.getZ() > 0) {
             int ticks = (int) Math.round(rot.getZ() / 90);
-            System.out.println("Z rotation currently unsupported");
         }
         return slot;
     }
@@ -110,11 +108,9 @@ public class ForgeMultipartExistsCompat implements ForgeMultipartCompat, BlockTr
         }
         if (rot.getX() < 0) {
             int ticks = (int) Math.round(rot.getX() / 90);
-            System.out.println("X rotation currently unsupported");
         }
         if (rot.getZ() > 0) {
             int ticks = (int) Math.round(rot.getZ() / 90);
-            System.out.println("Z rotation currently unsupported");
         }
         return slot;
     }
@@ -130,11 +126,9 @@ public class ForgeMultipartExistsCompat implements ForgeMultipartCompat, BlockTr
         }
         if (rot.getX() < 0) {
             int ticks = (int) Math.round(rot.getX() / 90);
-            System.out.println("X rotation currently unsupported");
         }
         if (rot.getZ() > 0) {
             int ticks = (int) Math.round(rot.getZ() / 90);
-            System.out.println("Z rotation currently unsupported");
         }
         return slot;
     }
@@ -151,11 +145,9 @@ public class ForgeMultipartExistsCompat implements ForgeMultipartCompat, BlockTr
         }
         if (rot.getX() < 0) {
             int ticks = (int) Math.round(rot.getX() / 90);
-            System.out.println("X rotation currently unsupported");
         }
         if (rot.getZ() > 0) {
             int ticks = (int) Math.round(rot.getZ() / 90);
-            System.out.println("Z rotation currently unsupported");
         }
         return slot;
     }
@@ -174,6 +166,14 @@ public class ForgeMultipartExistsCompat implements ForgeMultipartCompat, BlockTr
         }
         val affine = (AffineTransform) transform;
         Vector rot = affine.getRotations();
+        if (rot.getX() > 0) {
+            System.out.println("X rotation is currently unsupported");
+            rot = rot.setX(0);
+        }
+        if (rot.getZ() > 0) {
+            System.out.println("Z rotation is currently unsupported");
+            rot = rot.setZ(0);
+        }
         if (rot.lengthSq() == 0) {
             return block;
         }
