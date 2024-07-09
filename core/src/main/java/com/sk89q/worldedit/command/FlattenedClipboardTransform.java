@@ -122,7 +122,7 @@ class FlattenedClipboardTransform {
      * @return the operation
      */
     public Operation copyTo(Extent target) {
-        BlockTransformExtent extent = new BlockTransformExtent(original, transform, worldData.getBlockRegistry());
+        BlockTransformExtent extent = new BlockTransformExtent(original, transform, worldData.getBlockRegistry(), worldData.getBlockTransformHook());
         ForwardExtentCopy copy = new ForwardExtentCopy(extent, original.getRegion(), original.getOrigin(), target, original.getOrigin());
         copy.setTransform(transform);
         return copy;

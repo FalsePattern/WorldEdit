@@ -90,7 +90,7 @@ public class PasteBuilder {
      * @return the operation
      */
     public Operation build() {
-        BlockTransformExtent extent = new BlockTransformExtent(clipboard, transform, targetWorldData.getBlockRegistry());
+        BlockTransformExtent extent = new BlockTransformExtent(clipboard, transform, targetWorldData.getBlockRegistry(), targetWorldData.getBlockTransformHook());
         ForwardExtentCopy copy = new ForwardExtentCopy(extent, clipboard.getRegion(), clipboard.getOrigin(), targetExtent, to);
         copy.setTransform(transform);
         if (ignoreAirBlocks) {

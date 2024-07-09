@@ -28,6 +28,7 @@ import com.sk89q.worldedit.math.transform.Transform;
 import com.sk89q.worldedit.world.registry.BlockRegistry;
 import com.sk89q.worldedit.world.registry.State;
 import com.sk89q.worldedit.world.registry.StateValue;
+import lombok.val;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -44,19 +45,27 @@ public class BlockTransformExtent extends AbstractDelegateExtent {
 
     private final Transform transform;
     private final BlockRegistry blockRegistry;
+    private final BlockTransformHook transformHook;
 
+    //For binary compat
+    @Deprecated
+    public BlockTransformExtent(Extent extent, Transform transform, BlockRegistry blockRegistry) {
+        this(extent, transform, blockRegistry, BlockTransformHook.NULL_HOOK);
+    }
     /**
      * Create a new instance.
      *
      * @param extent the extent
      * @param blockRegistry the block registry used for block direction data
      */
-    public BlockTransformExtent(Extent extent, Transform transform, BlockRegistry blockRegistry) {
+    public BlockTransformExtent(Extent extent, Transform transform, BlockRegistry blockRegistry, BlockTransformHook transformHook) {
         super(extent);
         checkNotNull(transform);
         checkNotNull(blockRegistry);
+        checkNotNull(transformHook);
         this.transform = transform;
         this.blockRegistry = blockRegistry;
+        this.transformHook = transformHook;
     }
 
     /**
@@ -76,8 +85,8 @@ public class BlockTransformExtent extends AbstractDelegateExtent {
      * @return the same block
      */
     private BaseBlock transformBlock(BaseBlock block, boolean reverse) {
-        transform(block, reverse ? transform.inverse() : transform, blockRegistry);
-        return block;
+        val useTransform = reverse ? transform.inverse() : transform;
+        return transformHook.transformBlock(transform(block, useTransform, blockRegistry), useTransform);
     }
 
     @Override
