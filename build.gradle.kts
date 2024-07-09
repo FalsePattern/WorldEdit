@@ -52,12 +52,25 @@ repositories {
             includeGroup("com.falsepattern")
         }
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "mega"
+                url = uri("https://mvn.falsepattern.com/gtmega_releases/")
+            }
+        }
+        filter {
+            includeGroup("codechicken")
+        }
+    }
 }
 
 dependencies {
     shadowImplementation(project(":core"))
-
-    compileOnly(deobfCurse("forgemultipart-229323:2242993"))
-    devOnlyNonPublishable(deobfCurse("architecturecraft-242001:2352554"))
     implementationSplit("com.falsepattern:falsepatternlib-mc1.7.10:1.2.5")
+
+    devOnlyNonPublishable("codechicken:forgemultipart-mc1.7.10:1.6.2-mega:dev")
+    devOnlyNonPublishable(deobfCurse("architecturecraft-242001:2352554"))
+
+    runtimeOnlyNonPublishable("codechicken:notenoughitems-mc1.7.10:2.3.1-mega:dev")
 }
