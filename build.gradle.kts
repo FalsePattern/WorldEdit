@@ -3,17 +3,25 @@ plugins {
     id("fpgradle-minecraft") version("0.3.3")
 }
 
-group = "com.sk89q.worldedit"
+group = "com.falsepattern"
 
 minecraft_fp {
     mod {
         modid   = "worldedit"
         name    = "WorldEdit"
-        rootPkg = "$group.forge"
+        rootPkg = "com.sk89q.worldedit.forge"
     }
 
     tokens {
         tokenClass = "Tags"
+    }
+
+    publish {
+        changelog = "https://github.com/FalsePattern/WorldEdit/blob/master/CHANGELOG.txt"
+        maven {
+            repoName = "mavenpattern"
+            repoUrl = "https://mvn.falsepattern.com/releases/"
+        }
     }
 }
 
