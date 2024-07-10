@@ -29,5 +29,3 @@ pluginManagement {
 }
 
 rootProject.name = "WorldEdit"
-
-include("core")

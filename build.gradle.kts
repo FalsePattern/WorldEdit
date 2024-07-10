@@ -1,6 +1,5 @@
-import com.falsepattern.fpgradle.dsl.* //Helper utilities for cleaner buildscript code
 plugins {
-    id("fpgradle-minecraft") version("0.3.3")
+    id("fpgradle-minecraft") version("0.4.0")
 }
 
 group = "com.falsepattern"
@@ -26,52 +25,10 @@ minecraft_fp {
 }
 
 repositories {
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "cursemaven"
-                url = uri("https://mvn.falsepattern.com/cursemaven/")
-            }
-        }
-        filter {
-            includeGroup("curse.maven")
-        }
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "sk89q"
-                url = uri("https://maven.enginehub.org/repo/")
-            }
-        }
-        filter {
-            includeGroup("com.sk89q")
-            includeGroup("com.sk89q.lib")
-        }
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "mavenpattern"
-                url = uri("https://mvn.falsepattern.com/releases/")
-            }
-        }
-        filter {
-            includeGroup("com.falsepattern")
-        }
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "mega"
-                url = uri("https://mvn.falsepattern.com/gtmega_releases/")
-            }
-        }
-        filter {
-            includeGroup("codechicken")
-            includeGroup("mega")
-        }
-    }
+    cursemavenEX()
+    exclusive(maven("sk89q", "https://maven.enginehub.org/repo/"), "com.sk89q", "com.sk89q.lib")
+    exclusive(mavenpattern(), "com.falsepattern")
+    exclusive(mega(), "codechicken", "mega")
 }
 
 sourceSets {
