@@ -26,6 +26,7 @@ public class CommonProxy {
 
     public void registerHandlers() {
         NetworkRegistry.INSTANCE.registerGuiHandler(ForgeWorldEdit.inst, new GuiHandler());
+        WECUIPacketHandler.init();
     }
 
 }

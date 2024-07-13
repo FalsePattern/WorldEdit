@@ -41,6 +41,10 @@ public class WECUIPacketHandler {
          WECUI_CHANNEL.register(new WECUIPacketHandler());
     }
 
+    public static FMLEventChannel channel() {
+        return WECUI_CHANNEL;
+    }
+
     @SubscribeEvent
     public void onPacketData(ServerCustomPacketEvent event) {
         C17PacketCustomPayload rawPacket = (C17PacketCustomPayload) event.packet.toC17Packet();
