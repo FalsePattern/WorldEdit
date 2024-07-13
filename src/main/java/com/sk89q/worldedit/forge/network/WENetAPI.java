@@ -46,6 +46,8 @@ public final class WENetAPI {
             return;
         }
         CUI_HANDLER_SETUP = true;
+        CUI_HANDSHAKE_CALLBACK = handshakeCallback;
+        CUI_STATE_CALLBACK = stateCallback;
 
         LOG.info("Setup CUI Handler for: {}", implName);
         LOG.trace("Trace: ", new Throwable());
