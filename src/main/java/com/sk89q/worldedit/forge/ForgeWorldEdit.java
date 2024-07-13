@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.forge;
 
 import com.google.common.base.Joiner;
+import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldVector;
@@ -79,7 +80,6 @@ public class ForgeWorldEdit {
 
     public static Logger logger;
     public static final String MOD_ID = "worldedit";
-    public static final String CUI_PLUGIN_CHANNEL = "WECUI";
 
     private ForgePermissionsProvider provider;
 
@@ -122,7 +122,7 @@ public class ForgeWorldEdit {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
-        proxy.registerHandlers();
+        proxy.registerHandlers(config);
     }
 
     @EventHandler

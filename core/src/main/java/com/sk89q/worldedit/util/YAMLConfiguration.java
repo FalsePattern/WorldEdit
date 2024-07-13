@@ -119,6 +119,9 @@ public class YAMLConfiguration extends LocalConfiguration {
         String type = config.getString("shell-save-type", "").trim();
         shellSaveType = type.equals("") ? null : type;
 
+        netAllowCUI = config.getBoolean("net.allow-cui", netAllowCUI);
+        netLogErrors = config.getBoolean("net.netLogErrors", netLogErrors);
+        netLogVerbose = config.getBoolean("net.netLogVerbose", netLogVerbose);
     }
 
     public void unload() {

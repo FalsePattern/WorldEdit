@@ -120,6 +120,10 @@ public class PropertiesConfiguration extends LocalConfiguration {
             snapshotRepo = new SnapshotRepository(snapshotsDir);
         }
 
+        netAllowCUI = getBool("allow-cui", netAllowCUI);
+        netLogErrors = getBool("netLogErrors", netLogErrors);
+        netLogVerbose = getBool("netLogVerbose", netLogVerbose);
+
         OutputStream output = null;
         path.getParentFile().mkdirs();
         try {
