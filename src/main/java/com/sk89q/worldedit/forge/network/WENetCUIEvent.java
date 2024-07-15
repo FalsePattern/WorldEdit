@@ -8,6 +8,7 @@ import cpw.mods.fml.relauncher.Side;
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.UtilityClass;
 import net.minecraft.entity.player.EntityPlayerMP;
 
@@ -32,6 +33,7 @@ final class WENetCUIEvent {
         }
     }
 
+    @ToString
     @NoArgsConstructor
     @AllArgsConstructor
     public static class S2CMessage implements IMessage {

@@ -11,6 +11,7 @@ import lombok.val;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,11 +36,25 @@ public final class WENetWrapper {
         LOG_ERRORS = cfg.netLogErrors || cfg.netLogVerbose;
         LOG_VERBOSE = cfg.netLogVerbose;
 
+        if (LOG_VERBOSE) {
+            tryForcingLoggingToConsole(LOG);
+        }
+
         NET_WRAPPER = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
 
         if (ALLOW_CUI) {
             WENetCUIHandshake.register(NET_WRAPPER, CUI_HANDSHAKE_C2S_ID, CUI_HANDSHAKE_S2C_ID);
             WENetCUIEvent.register(NET_WRAPPER, CUI_EVENT_S2C_ID);
+        }
+    }
+
+    //TODO: Remove once a better option is found
+    @Deprecated
+    private static void tryForcingLoggingToConsole(Logger logger) {
+        try {
+            ((org.apache.logging.log4j.core.Logger) logger).setLevel(Level.ALL);
+        } catch (Throwable t) {
+            logger.warn("Failed to force [DEBUG] and [TRACE] logging to console, messages will still appear in: 'fml-client-*.log'", t);
         }
     }
 
