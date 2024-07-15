@@ -7,7 +7,6 @@ import lombok.val;
 
 import static com.sk89q.worldedit.forge.network.WENetWrapper.*;
 
-
 interface SafeMessageHandler {
     @FunctionalInterface
     interface WithReply<IN extends IMessage, OUT extends IMessage> extends IMessageHandler<IN, OUT> {
@@ -44,5 +43,4 @@ interface SafeMessageHandler {
             return null;
         }
     }
-
 }

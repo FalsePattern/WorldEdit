@@ -1,6 +1,5 @@
 package com.sk89q.worldedit.forge.network;
 
-import com.sk89q.worldedit.forge.ForgeWorldEdit;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
@@ -14,6 +13,7 @@ import lombok.val;
 
 import static com.sk89q.worldedit.forge.network.WENetAPI.CUI_HANDSHAKE_CALLBACK;
 import static com.sk89q.worldedit.forge.network.WENetAPI.WECUI_API_VERSION;
+import static com.sk89q.worldedit.forge.network.WENetWrapper.sessionFromContext;
 
 
 @UtilityClass
@@ -23,7 +23,7 @@ final class WENetCUIHandshake {
         netWrapper.registerMessage(new S2CHandler(), S2CMessage.class, s2cId, Side.CLIENT);
     }
 
-    static void execute(int clientApiVersion) {
+    static void sendCUIHandshakeC2S(int clientApiVersion) {
         WENetWrapper.sendC2SRequest(new C2SMessage(clientApiVersion));
     }
 
@@ -31,18 +31,22 @@ final class WENetCUIHandshake {
     static class C2SHandler implements SafeMessageHandler.WithReply<C2SMessage, S2CMessage> {
         @Override
         public S2CMessage onMessage(MessageContext ctx, C2SMessage msg) {
-            try {
-                if (msg.clientApiVersion != WECUI_API_VERSION)
-                    return new S2CMessage(false, WECUI_API_VERSION);
+            checks:
+            {
+                val session = sessionFromContext(ctx);
+                if (session == null)
+                    break checks;
+                if (msg.clientApiVersion != WECUI_API_VERSION) {
+                    session.setCUISupport(false);
+                    session.setCUIVersion(-1);
+                    break checks;
+                }
 
-                val session = ForgeWorldEdit.inst.getSession(ctx.getServerHandler().playerEntity);
-                if (!session.hasCUISupport())
-                    session.handleCUIInitializationMessage("v|" + msg.clientApiVersion);
-
+                session.setCUISupport(true);
+                session.setCUIVersion(msg.clientApiVersion);
                 return new S2CMessage(true, WECUI_API_VERSION);
-            } catch (Exception e) {
-                return null;
             }
+            return new S2CMessage(false, WECUI_API_VERSION);
         }
     }
 

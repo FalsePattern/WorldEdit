@@ -7,8 +7,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static com.sk89q.worldedit.forge.network.WENetWrapper.ALLOW_CUI;
-import static com.sk89q.worldedit.forge.network.WENetWrapper.LOG;
+import static com.sk89q.worldedit.forge.network.WENetWrapper.*;
 
 @UtilityClass
 public final class WENetAPI {
@@ -53,15 +52,32 @@ public final class WENetAPI {
         LOG.trace("Trace: ", new Throwable());
     }
 
-    public static void sendCUIHandshake(int clientAPIVersion) {
+    public static void requestCUIHandshake(int clientAPIVersion) {
         if (!ALLOW_CUI)
             return;
 
         if (!CUI_HANDLER_SETUP) {
-            LOG.warn("Handshake requested with no WECUI handler set", new Throwable());
+            LOG.warn("Requested CUI Handshake with no WECUI handler set", new Throwable());
             return;
         }
-        WENetCUIHandshake.execute(clientAPIVersion);
+
+        if (LOG_VERBOSE)
+            LOG.debug("Requested CUI Handshake with version: [{}]", clientAPIVersion);
+        WENetCUIHandshake.sendCUIHandshakeC2S(clientAPIVersion);
+    }
+
+    public static void requestCUISetup() {
+        if (!ALLOW_CUI)
+            return;
+
+        if (!CUI_HANDLER_SETUP) {
+            LOG.warn("Requested CUI Update with no WECUI handler set", new Throwable());
+            return;
+        }
+
+        if (LOG_VERBOSE)
+            LOG.debug("Requested CUI Update");
+        WENetCUIEvent.requestCUIUpdateC2S();
     }
 
     private static void nullCheck(Object val, String name) {

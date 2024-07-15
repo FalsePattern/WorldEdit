@@ -1,6 +1,9 @@
 package com.sk89q.worldedit.forge.network;
 
 import com.sk89q.worldedit.LocalConfiguration;
+import com.sk89q.worldedit.LocalSession;
+import com.sk89q.worldedit.extension.platform.Actor;
+import com.sk89q.worldedit.forge.ForgeWorldEdit;
 import com.sk89q.worldedit.forge.Tags;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
@@ -11,9 +14,9 @@ import lombok.val;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 import static com.sk89q.worldedit.forge.Tags.MOD_ID;
 
@@ -23,7 +26,8 @@ public final class WENetWrapper {
 
     private static final int CUI_HANDSHAKE_C2S_ID = 0;
     private static final int CUI_HANDSHAKE_S2C_ID = 1;
-    private static final int CUI_EVENT_S2C_ID     = 2;
+    private static final int CUI_EVENT_C2S_ID = 2;
+    private static final int CUI_EVENT_S2C_ID = 3;
 
     static boolean ALLOW_CUI;
     static boolean LOG_ERRORS;
@@ -40,14 +44,13 @@ public final class WENetWrapper {
 
         if (ALLOW_CUI) {
             WENetCUIHandshake.register(NET_WRAPPER, CUI_HANDSHAKE_C2S_ID, CUI_HANDSHAKE_S2C_ID);
-            WENetCUIEvent.register(NET_WRAPPER, CUI_EVENT_S2C_ID);
+            WENetCUIEvent.register(NET_WRAPPER, CUI_EVENT_C2S_ID, CUI_EVENT_S2C_ID);
         }
     }
 
-
     public static void sendCUIEvent(EntityPlayerMP player, String evt) {
         if (ALLOW_CUI)
-            WENetCUIEvent.execute(player, evt);
+            WENetCUIEvent.sendCUIUpdateS2C(player, evt);
     }
 
     static void sendC2SRequest(IMessage msg) {
@@ -132,8 +135,32 @@ public final class WENetWrapper {
                 if (!name.isEmpty())
                     return name;
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return "!UNKNOWN!";
+    }
+
+    static @Nullable LocalSession sessionFromContext(MessageContext ctx) {
+        try {
+            return ForgeWorldEdit.inst.getSession(ctx.getServerHandler().playerEntity);
+        } catch (Exception e) {
+            if (LOG_ERRORS) {
+                LOG.error("Failed to get session for player: [{}]", nameFromContext(ctx));
+                LOG.error("Trace: ", e);
+            }
+            return null;
+        }
+    }
+
+    static @Nullable Actor actorFromContext(MessageContext ctx) {
+        try {
+            return ForgeWorldEdit.inst.wrap(ctx.getServerHandler().playerEntity);
+        } catch (Exception e) {
+            if (LOG_ERRORS) {
+                LOG.error("Failed to get actor for player: [{}]", nameFromContext(ctx));
+                LOG.error("Trace: ", e);
+            }
+            return null;
+        }
     }
 }

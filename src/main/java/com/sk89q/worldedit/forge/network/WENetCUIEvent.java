@@ -10,19 +10,56 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.UtilityClass;
+import lombok.val;
 import net.minecraft.entity.player.EntityPlayerMP;
 
-import static com.sk89q.worldedit.forge.network.WENetAPI.*;
+import static com.sk89q.worldedit.forge.network.WENetAPI.CUI_STATE_CALLBACK;
+import static com.sk89q.worldedit.forge.network.WENetWrapper.*;
 
 
 @UtilityClass
 final class WENetCUIEvent {
-    static void register(SimpleNetworkWrapper netWrapper, int s2cId) {
+    static void register(SimpleNetworkWrapper netWrapper, int c2sId, int s2cId) {
+        netWrapper.registerMessage(new C2SHandler(), C2SMessage.class, c2sId, Side.SERVER);
         netWrapper.registerMessage(new S2CHandler(), S2CMessage.class, s2cId, Side.CLIENT);
     }
 
-    static void execute(EntityPlayerMP player, String evt) {
+    static void requestCUIUpdateC2S() {
+        WENetWrapper.sendC2SRequest(new WENetCUIEvent.C2SMessage());
+    }
+
+    static void sendCUIUpdateS2C(EntityPlayerMP player, String evt) {
         WENetWrapper.sendS2CRequest(player, new WENetCUIEvent.S2CMessage(evt));
+    }
+
+    @NoArgsConstructor
+    static class C2SHandler implements SafeMessageHandler.NoReply<C2SMessage> {
+        @Override
+        public void onMessage(MessageContext ctx, C2SMessage msg) {
+            val playerName = nameFromContext(ctx);
+
+            val session = sessionFromContext(ctx);
+            if (session == null) {
+                if (LOG_ERRORS)
+                    LOG.error("Cannot update CUI for player: [{}] with no session", playerName);
+                return;
+            }
+            if (!session.hasCUISupport()) {
+                if (LOG_ERRORS)
+                    LOG.error("Cannot update CUI for player: [{}] with no CUI support", playerName);
+                return;
+            }
+            val actor = actorFromContext(ctx);
+            if (actor == null) {
+                if (LOG_ERRORS)
+                    LOG.error("Cannot update CUI for player: [{}] with no actor", playerName);
+                return;
+            }
+
+            session.dispatchCUISetup(actor);
+            if (LOG_VERBOSE)
+                LOG.debug("Updated CUI for player: [{}]", playerName);
+        }
     }
 
     @NoArgsConstructor
@@ -30,6 +67,21 @@ final class WENetCUIEvent {
         @Override
         public void onMessage(MessageContext ctx, S2CMessage msg) {
             CUI_STATE_CALLBACK.accept(msg.evt);
+        }
+    }
+
+    @ToString
+    @NoArgsConstructor
+//    @AllArgsConstructor
+    public static class C2SMessage implements IMessage {
+        @Override
+        public void fromBytes(ByteBuf buf) {
+            // No-Op
+        }
+
+        @Override
+        public void toBytes(ByteBuf buf) {
+            // No-Op
         }
     }
 
