@@ -36,10 +36,6 @@ public final class WENetWrapper {
         LOG_ERRORS = cfg.netLogErrors || cfg.netLogVerbose;
         LOG_VERBOSE = cfg.netLogVerbose;
 
-        if (LOG_VERBOSE) {
-            tryForcingLoggingToConsole(LOG);
-        }
-
         NET_WRAPPER = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
 
         if (ALLOW_CUI) {
@@ -48,15 +44,6 @@ public final class WENetWrapper {
         }
     }
 
-    //TODO: Remove once a better option is found
-    @Deprecated
-    private static void tryForcingLoggingToConsole(Logger logger) {
-        try {
-            ((org.apache.logging.log4j.core.Logger) logger).setLevel(Level.ALL);
-        } catch (Throwable t) {
-            logger.warn("Failed to force [DEBUG] and [TRACE] logging to console, messages will still appear in: 'fml-client-*.log'", t);
-        }
-    }
 
     public static void sendCUIEvent(EntityPlayerMP player, String evt) {
         if (ALLOW_CUI)
