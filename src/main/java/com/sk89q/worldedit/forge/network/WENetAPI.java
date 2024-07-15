@@ -22,9 +22,6 @@ public final class WENetAPI {
     public static void setupCUIHandler(@NotNull String implName,
                                        @NotNull BiConsumer<Boolean, Integer> handshakeCallback,
                                        @NotNull Consumer<String> stateCallback) {
-        if (!ALLOW_CUI)
-            return;
-
         if (CUI_HANDLER_SETUP) {
             LOG.warn("Potentially conflicting WECUI implementations, {} is setup but {} will be ignored.",
                      CUI_IMPL_NAME,
