@@ -19,16 +19,15 @@
 
 package com.sk89q.worldedit.forge;
 
-import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.forge.gui.GuiHandler;
 import com.sk89q.worldedit.forge.network.WENetWrapper;
 import cpw.mods.fml.common.network.NetworkRegistry;
 
 public class CommonProxy {
 
-    public void registerHandlers(LocalConfiguration config) {
+    public void registerHandlers() {
         NetworkRegistry.INSTANCE.registerGuiHandler(ForgeWorldEdit.inst, new GuiHandler());
-        WENetWrapper.init(config);
+        WENetWrapper.init(ForgeWorldEdit.inst.getConfig());
     }
 
 }

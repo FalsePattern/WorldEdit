@@ -123,7 +123,7 @@ public class ForgeWorldEdit {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
-        proxy.registerHandlers(config);
+        proxy.registerHandlers();
     }
 
     @EventHandler

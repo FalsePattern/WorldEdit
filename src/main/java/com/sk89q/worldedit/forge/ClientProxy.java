@@ -19,14 +19,13 @@
 
 package com.sk89q.worldedit.forge;
 
-import com.sk89q.worldedit.LocalConfiguration;
 import cpw.mods.fml.common.FMLCommonHandler;
 
 public class ClientProxy extends CommonProxy {
 
     @Override
-    public void registerHandlers(LocalConfiguration config) {
-        super.registerHandlers(config);
+    public void registerHandlers() {
+        super.registerHandlers();
         FMLCommonHandler.instance().bus().register(new KeyHandler());
     }
 
