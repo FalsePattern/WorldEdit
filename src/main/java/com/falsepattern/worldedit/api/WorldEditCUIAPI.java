@@ -26,7 +26,7 @@ import java.util.function.Consumer;
  * <p>
  * It is also possible to use {@link WorldEditCUIAPI#requestCUIUpdate} to request a full update of the current CUI state.
  */
-//TODO: Include @StableAPI markers
+@StableAPI(since = "6.3.0")
 @SideOnly(Side.CLIENT)
 public final class WorldEditCUIAPI {
     private WorldEditCUIAPI() {
@@ -48,7 +48,7 @@ public final class WorldEditCUIAPI {
      * @param handshakeCallback Callback for the CUI Handshake from the server
      * @param eventCallback     Callback for CUI Events from the server
      */
-    //TODO: Include @StableAPI markers
+    @StableAPI.Expose
     public static void initCUIHandler(@NotNull String implName,
                                       @NotNull BiConsumer<Boolean, Integer> handshakeCallback,
                                       @NotNull Consumer<String> eventCallback) {
@@ -64,7 +64,7 @@ public final class WorldEditCUIAPI {
      *
      * @param clientAPIVersion The Client API version of this implementation
      */
-    //TODO: Include @StableAPI markers
+    @StableAPI.Expose
     public static void requestCUIHandshake(int clientAPIVersion) {
         WENetHandler.requestCUIHandshake(clientAPIVersion);
     }
@@ -76,7 +76,7 @@ public final class WorldEditCUIAPI {
      * <p>
      * Otherwise, no reply will be sent back to the client.
      */
-    //TODO: Include @StableAPI markers
+    @StableAPI.Expose
     public static void requestCUIUpdate() {
         WENetHandler.requestCUIUpdate();
     }

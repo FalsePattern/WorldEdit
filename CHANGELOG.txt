@@ -1,5 +1,6 @@
 --- FORK CHANGELOG ---
 
+6.3.0
 - Fixed sessions not being reset on world change
 - Revamped the WorldEditCUI API. The packet networking system has been replaced. The new CUI version is v4 (unofficial).
   Unlike the old implementation, this system expect that the client also has WorldEdit installed,
