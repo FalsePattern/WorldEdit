@@ -114,7 +114,7 @@ public final class WENetWrapper {
         EntityPlayer player = null;
         try {
             if (ctx.side.isClient()) {
-                player = Minecraft.getMinecraft().thePlayer;
+                throw new IllegalStateException();
             } else {
                 player = ctx.getServerHandler().playerEntity;
             }
