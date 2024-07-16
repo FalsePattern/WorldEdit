@@ -64,7 +64,7 @@ final class WENetCUIEvent {
     static class S2CHandler implements SafeMessageHandler.NoReply<S2CMessage> {
         @Override
         public void onMessage(MessageContext ctx, S2CMessage msg) {
-            CUI_STATE_CALLBACK.accept(msg.evt);
+            CUI_EVENT_CALLBACK.accept(msg.evt);
         }
     }
 

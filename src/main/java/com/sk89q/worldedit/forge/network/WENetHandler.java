@@ -43,7 +43,7 @@ public final class WENetHandler {
 
     static String CUI_IMPL_NAME;
     static BiConsumer<Boolean, Integer> CUI_HANDSHAKE_CALLBACK;
-    static Consumer<String> CUI_STATE_CALLBACK;
+    static Consumer<String> CUI_EVENT_CALLBACK;
 
     private static SimpleNetworkWrapper NET_WRAPPER;
 
@@ -65,7 +65,7 @@ public final class WENetHandler {
 
     public static void initCUIHandler(@NotNull String implName,
                                       @NotNull BiConsumer<Boolean, Integer> handshakeCallback,
-                                      @NotNull Consumer<String> stateCallback) {
+                                      @NotNull Consumer<String> eventCallback) {
         if (CUI_HANDLER_SETUP) {
             LOG.warn("Potentially conflicting WECUI implementations, {} is setup but {} will be ignored.",
                      CUI_IMPL_NAME,
@@ -77,7 +77,7 @@ public final class WENetHandler {
         try {
             nullCheck(implName, "Implementation name");
             nullCheck(handshakeCallback, "Handshake callback");
-            nullCheck(stateCallback, "State callback");
+            nullCheck(eventCallback, "Event callback");
 
             if (implName.isEmpty())
                 throw new IllegalArgumentException("Implementation name must not be empty");
@@ -87,7 +87,7 @@ public final class WENetHandler {
         }
         CUI_HANDLER_SETUP = true;
         CUI_HANDSHAKE_CALLBACK = handshakeCallback;
-        CUI_STATE_CALLBACK = stateCallback;
+        CUI_EVENT_CALLBACK = eventCallback;
 
         LOG.info("Setup CUI Handler for: {}", implName);
     }
