@@ -11,10 +11,7 @@ import lombok.ToString;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 
-import static com.sk89q.worldedit.forge.network.WENetAPI.CUI_HANDSHAKE_CALLBACK;
-import static com.sk89q.worldedit.forge.network.WENetAPI.WECUI_API_VERSION;
-import static com.sk89q.worldedit.forge.network.WENetWrapper.sessionFromContext;
-
+import static com.sk89q.worldedit.forge.network.WENetHandler.*;
 
 @UtilityClass
 final class WENetCUIHandshake {
@@ -24,7 +21,7 @@ final class WENetCUIHandshake {
     }
 
     static void sendCUIHandshakeC2S(int clientApiVersion) {
-        WENetWrapper.sendC2SRequest(new C2SMessage(clientApiVersion));
+        WENetHandler.sendC2SRequest(new C2SMessage(clientApiVersion));
     }
 
     @NoArgsConstructor

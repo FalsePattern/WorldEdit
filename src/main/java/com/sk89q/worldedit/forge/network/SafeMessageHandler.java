@@ -5,7 +5,7 @@ import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import lombok.val;
 
-import static com.sk89q.worldedit.forge.network.WENetWrapper.*;
+import static com.sk89q.worldedit.forge.network.WENetHandler.*;
 
 interface SafeMessageHandler {
     @FunctionalInterface

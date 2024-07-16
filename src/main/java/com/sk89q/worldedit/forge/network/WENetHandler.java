@@ -4,25 +4,31 @@ import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.extension.platform.Actor;
 import com.sk89q.worldedit.forge.ForgeWorldEdit;
-import com.sk89q.worldedit.forge.Tags;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import lombok.experimental.UtilityClass;
 import lombok.val;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
 import static com.sk89q.worldedit.forge.Tags.MOD_ID;
+import static com.sk89q.worldedit.forge.Tags.MOD_NAME;
 
 @UtilityClass
-public final class WENetWrapper {
-    static final Logger LOG = LogManager.getLogger(Tags.MOD_NAME + "|Networking");
+public final class WENetHandler {
+    static final Logger LOG = LogManager.getLogger(MOD_NAME + "|Network");
+
+    static final int WECUI_API_VERSION = 4;
 
     private static final int CUI_HANDSHAKE_C2S_ID = 0;
     private static final int CUI_HANDSHAKE_S2C_ID = 1;
@@ -33,8 +39,15 @@ public final class WENetWrapper {
     static boolean LOG_ERRORS;
     static boolean LOG_VERBOSE;
 
+    static boolean CUI_HANDLER_SETUP = false;
+
+    static String CUI_IMPL_NAME;
+    static BiConsumer<Boolean, Integer> CUI_HANDSHAKE_CALLBACK;
+    static Consumer<String> CUI_STATE_CALLBACK;
+
     private static SimpleNetworkWrapper NET_WRAPPER;
 
+    // region Init
     public static void init(LocalConfiguration cfg) {
         ALLOW_CUI = cfg.netAllowCUI;
         LOG_ERRORS = cfg.netLogErrors || cfg.netLogVerbose;
@@ -45,7 +58,67 @@ public final class WENetWrapper {
         if (ALLOW_CUI) {
             WENetCUIHandshake.register(NET_WRAPPER, CUI_HANDSHAKE_C2S_ID, CUI_HANDSHAKE_S2C_ID);
             WENetCUIEvent.register(NET_WRAPPER, CUI_EVENT_C2S_ID, CUI_EVENT_S2C_ID);
+        } else {
+            LOG.debug("CUI is Disabled, skipping packet registration");
         }
+    }
+
+    public static void initCUIHandler(@NotNull String implName,
+                                      @NotNull BiConsumer<Boolean, Integer> handshakeCallback,
+                                      @NotNull Consumer<String> stateCallback) {
+        if (CUI_HANDLER_SETUP) {
+            LOG.warn("Potentially conflicting WECUI implementations, {} is setup but {} will be ignored.",
+                     CUI_IMPL_NAME,
+                     implName,
+                     new Throwable());
+            return;
+        }
+
+        try {
+            nullCheck(implName, "Implementation name");
+            nullCheck(handshakeCallback, "Handshake callback");
+            nullCheck(stateCallback, "State callback");
+
+            if (implName.isEmpty())
+                throw new IllegalArgumentException("Implementation name must not be empty");
+        } catch (RuntimeException e) {
+            LOG.error("Failed to setup WECUI handler:", e);
+            return;
+        }
+        CUI_HANDLER_SETUP = true;
+        CUI_HANDSHAKE_CALLBACK = handshakeCallback;
+        CUI_STATE_CALLBACK = stateCallback;
+
+        LOG.info("Setup CUI Handler for: {}", implName);
+    }
+    // endregion
+
+    public static void requestCUIHandshake(int clientAPIVersion) {
+        if (!ALLOW_CUI)
+            return;
+
+        if (!CUI_HANDLER_SETUP) {
+            LOG.warn("Requested CUI Handshake with no WECUI handler set", new Throwable());
+            return;
+        }
+
+        if (LOG_VERBOSE)
+            LOG.debug("Requested CUI Handshake with version: [{}]", clientAPIVersion);
+        WENetCUIHandshake.sendCUIHandshakeC2S(clientAPIVersion);
+    }
+
+    public static void requestCUIUpdate() {
+        if (!ALLOW_CUI)
+            return;
+
+        if (!CUI_HANDLER_SETUP) {
+            LOG.warn("Requested CUI Update with no WECUI handler set", new Throwable());
+            return;
+        }
+
+        if (LOG_VERBOSE)
+            LOG.debug("Requested CUI Update");
+        WENetCUIEvent.requestCUIUpdateC2S();
     }
 
     public static void sendCUIEvent(EntityPlayerMP player, String evt) {
@@ -53,6 +126,7 @@ public final class WENetWrapper {
             WENetCUIEvent.sendCUIUpdateS2C(player, evt);
     }
 
+    // region Raw Requests
     static void sendC2SRequest(IMessage msg) {
         NET_WRAPPER.sendToServer(msg);
         if (LOG_VERBOSE)
@@ -64,7 +138,9 @@ public final class WENetWrapper {
         if (LOG_VERBOSE)
             LOG.debug("Sent request: [{}] to player: [{}]", msg, safePlayerName(player));
     }
+    // endregion
 
+    // region Logging
     static void logRequestReceived(MessageContext ctx, IMessage msg) {
         if (!LOG_VERBOSE)
             return;
@@ -109,7 +185,9 @@ public final class WENetWrapper {
         }
         LOG.error("Trace: ", e);
     }
+    // endregion
 
+    // region Util
     static String nameFromContext(MessageContext ctx) {
         EntityPlayer player = null;
         try {
@@ -161,4 +239,9 @@ public final class WENetWrapper {
             return null;
         }
     }
+
+    private static void nullCheck(Object val, String name) {
+        Objects.requireNonNull(val, name + " must not be null");
+    }
+    // endregion
 }

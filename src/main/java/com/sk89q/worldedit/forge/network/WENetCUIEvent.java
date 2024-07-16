@@ -13,9 +13,7 @@ import lombok.experimental.UtilityClass;
 import lombok.val;
 import net.minecraft.entity.player.EntityPlayerMP;
 
-import static com.sk89q.worldedit.forge.network.WENetAPI.CUI_STATE_CALLBACK;
-import static com.sk89q.worldedit.forge.network.WENetWrapper.*;
-
+import static com.sk89q.worldedit.forge.network.WENetHandler.*;
 
 @UtilityClass
 final class WENetCUIEvent {
@@ -25,11 +23,11 @@ final class WENetCUIEvent {
     }
 
     static void requestCUIUpdateC2S() {
-        WENetWrapper.sendC2SRequest(new WENetCUIEvent.C2SMessage());
+        WENetHandler.sendC2SRequest(new WENetCUIEvent.C2SMessage());
     }
 
     static void sendCUIUpdateS2C(EntityPlayerMP player, String evt) {
-        WENetWrapper.sendS2CRequest(player, new WENetCUIEvent.S2CMessage(evt));
+        WENetHandler.sendS2CRequest(player, new WENetCUIEvent.S2CMessage(evt));
     }
 
     @NoArgsConstructor

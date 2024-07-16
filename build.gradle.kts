@@ -1,5 +1,5 @@
 plugins {
-    id("fpgradle-minecraft") version("0.4.0")
+    id("fpgradle-minecraft") version("0.6.1")
 }
 
 group = "com.falsepattern"
@@ -13,6 +13,11 @@ minecraft_fp {
 
     tokens {
         tokenClass = "Tags"
+    }
+
+    api {
+        ignoreRootPkg = true
+        packages = listOf("com.falsepattern.worldedit.api")
     }
 
     publish {

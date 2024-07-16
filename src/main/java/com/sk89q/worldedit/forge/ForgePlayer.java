@@ -25,7 +25,7 @@ import com.sk89q.worldedit.WorldVector;
 import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.extension.platform.AbstractPlayerActor;
 import com.sk89q.worldedit.extent.inventory.BlockBag;
-import com.sk89q.worldedit.forge.network.WENetWrapper;
+import com.sk89q.worldedit.forge.network.WENetHandler;
 import com.sk89q.worldedit.internal.LocalWorldAdapter;
 import com.sk89q.worldedit.internal.cui.CUIEvent;
 import com.sk89q.worldedit.session.SessionKey;
@@ -114,7 +114,7 @@ public class ForgePlayer extends AbstractPlayerActor {
         if (params.length > 0) {
             send = send + "|" + StringUtil.joinString(params, "|");
         }
-        WENetWrapper.sendCUIEvent(this.player, send);
+        WENetHandler.sendCUIEvent(this.player, send);
     }
 
     @Override
