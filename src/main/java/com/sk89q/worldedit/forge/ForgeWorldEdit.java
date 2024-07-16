@@ -54,6 +54,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.CommandEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 import com.sk89q.worldedit.util.serialization.SerializationUtil;
@@ -170,6 +171,18 @@ public class ForgeWorldEdit {
     }
 
     @SubscribeEvent
+    public void onEntityJoinWorldEvent(EntityJoinWorldEvent e) {
+        if (e.world.isRemote)
+            return;
+
+        if (!(e.entity instanceof EntityPlayerMP)) {
+            return;
+        }
+
+        resetSession((EntityPlayerMP) e.entity);
+    }
+
+    @SubscribeEvent
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (platform == null) {
             return;
@@ -264,6 +277,10 @@ public class ForgeWorldEdit {
     public LocalSession getSession(EntityPlayerMP player) {
         checkNotNull(player);
         return WorldEdit.getInstance().getSessionManager().get(wrap(player));
+    }
+
+    public void resetSession(EntityPlayerMP player) {
+        WorldEdit.getInstance().getSessionManager().remove(wrap(player));
     }
 
     /**
