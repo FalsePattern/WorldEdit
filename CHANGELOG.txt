@@ -1,5 +1,12 @@
 --- FORK CHANGELOG ---
 
+- Fixed sessions not being reset on world change
+- Revamped the WorldEditCUI API. The packet networking system has been replaced. The new CUI version is v4 (unofficial).
+  Unlike the old implementation, this system expect that the client also has WorldEdit installed,
+  with the networking being fully delegated into WorldEdit internals.
+  The new API can be found in this package: (com.falsepattern.worldedit.api)
+  A reference implementation can be found here: (https://github.com/basdxz/WorldEditCUI)
+
 6.2.0
 - Added support for Schematica .schematic files, without the need for conversion
   (can still load old schematics from worldedit)

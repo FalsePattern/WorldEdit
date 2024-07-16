@@ -20,6 +20,7 @@
 package com.sk89q.worldedit.forge;
 
 import com.google.common.base.Joiner;
+import com.sk89q.worldedit.LocalConfiguration;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.WorldEdit;
 import com.sk89q.worldedit.WorldVector;
@@ -53,6 +54,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.CommandEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
 import com.sk89q.worldedit.util.serialization.SerializationUtil;
@@ -79,7 +81,6 @@ public class ForgeWorldEdit {
 
     public static Logger logger;
     public static final String MOD_ID = "worldedit";
-    public static final String CUI_PLUGIN_CHANNEL = "WECUI";
 
     private ForgePermissionsProvider provider;
 
@@ -167,6 +168,18 @@ public class ForgeWorldEdit {
                     new com.sk89q.worldedit.event.platform.CommandEvent(wrap((EntityPlayerMP) event.sender), Joiner.on(" ").join(split));
             WorldEdit.getInstance().getEventBus().post(weEvent);
         }
+    }
+
+    @SubscribeEvent
+    public void onEntityJoinWorldEvent(EntityJoinWorldEvent e) {
+        if (e.world.isRemote)
+            return;
+
+        if (!(e.entity instanceof EntityPlayerMP)) {
+            return;
+        }
+
+        resetSession((EntityPlayerMP) e.entity);
     }
 
     @SubscribeEvent
@@ -264,6 +277,10 @@ public class ForgeWorldEdit {
     public LocalSession getSession(EntityPlayerMP player) {
         checkNotNull(player);
         return WorldEdit.getInstance().getSessionManager().get(wrap(player));
+    }
+
+    public void resetSession(EntityPlayerMP player) {
+        WorldEdit.getInstance().getSessionManager().remove(wrap(player));
     }
 
     /**
