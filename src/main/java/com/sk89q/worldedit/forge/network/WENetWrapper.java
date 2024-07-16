@@ -113,11 +113,9 @@ public final class WENetWrapper {
     static String nameFromContext(MessageContext ctx) {
         EntityPlayer player = null;
         try {
-            if (ctx.side.isClient()) {
-                throw new IllegalStateException();
-            } else {
+            // Only called from server-side code anyway.
+            if (ctx.side.isServer())
                 player = ctx.getServerHandler().playerEntity;
-            }
         } catch (Exception ignored) {
         }
         return safePlayerName(player);
