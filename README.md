@@ -1,6 +1,6 @@
-<h1>
-    <img src="worldedit-logo.svg" alt="WorldEdit" width="400" /> 
-</h1>
+# WorldEdit Enhanced <img src="WEico.png" align="right" width=150>
+
+<sup>**[CurseForge](https://www.curseforge.com/minecraft/mc-mods/worldedit-legacy-enhanced) | [Modrinth](https://modrinth.com/mod/worldedit-legacy-enhanced)**</sup>
 
 WorldEdit is an easy-to-use in-game world editor for Minecraft, supporting both
 single player and multiplayer, that lets you:
