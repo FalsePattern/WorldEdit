@@ -24,8 +24,10 @@ import com.sk89q.worldedit.entity.BaseEntity;
 import com.sk89q.worldedit.entity.Entity;
 import com.sk89q.worldedit.entity.metadata.EntityType;
 import com.sk89q.worldedit.extent.Extent;
+import com.sk89q.worldedit.forge.compat.CustomNpcHandler;
 import com.sk89q.worldedit.util.Location;
 import com.sk89q.worldedit.world.NullWorld;
+import cpw.mods.fml.common.Loader;
 import net.minecraft.entity.EntityList;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -88,7 +90,12 @@ class ForgeEntity implements Entity {
     public boolean remove() {
         net.minecraft.entity.Entity entity = entityRef.get();
         if (entity != null) {
-            entity.setDead();
+
+            if (Loader.isModLoaded("customnpcs") && CustomNpcHandler.isNpc(entity)) {
+                CustomNpcHandler.deleteNpc(entity);
+            } else {
+                entity.setDead();
+            }
         }
         return true;
     }

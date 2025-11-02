@@ -35,6 +35,7 @@ public class ClipboardHolder {
     private final WorldData worldData;
     private final Clipboard clipboard;
     private Transform transform = new Identity();
+    private boolean copyEntities = true;
 
     /**
      * Create a new instance with the given clipboard.
@@ -87,6 +88,24 @@ public class ClipboardHolder {
      */
     public Transform getTransform() {
         return transform;
+    }
+
+    /**
+     * Return whether entities are copied.
+     *
+     * @return true if copying
+     */
+    public boolean isCopyingEntities() {
+        return copyEntities;
+    }
+
+    /**
+     * Set whether entities should be copied.
+     *
+     * @param copyEntities true if copying
+     */
+    public void setCopyingEntities(boolean copyEntities) {
+        this.copyEntities = copyEntities;
     }
 
     /**

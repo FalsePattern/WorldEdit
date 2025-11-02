@@ -20,6 +20,8 @@
 package com.sk89q.worldedit.forge;
 
 import com.sk89q.worldedit.entity.metadata.EntityType;
+import com.sk89q.worldedit.forge.compat.CustomNpcHandler;
+import cpw.mods.fml.common.Loader;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.IMerchant;
@@ -118,7 +120,7 @@ public class ForgeEntityType implements EntityType {
 
     @Override
     public boolean isNPC() {
-        return entity instanceof INpc || entity instanceof IMerchant;
+        return entity instanceof INpc || entity instanceof IMerchant || Loader.isModLoaded("customnpcs") && CustomNpcHandler.isNpc(entity);
     }
 
     @Override

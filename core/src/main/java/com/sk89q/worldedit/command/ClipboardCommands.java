@@ -44,6 +44,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.regions.RegionSelector;
 import com.sk89q.worldedit.regions.selector.CuboidRegionSelector;
 import com.sk89q.worldedit.session.ClipboardHolder;
+import com.sk89q.worldedit.session.PasteBuilder;
 import com.sk89q.worldedit.util.command.binding.Switch;
 import com.sk89q.worldedit.util.command.parametric.Optional;
 
@@ -74,7 +75,7 @@ public class ClipboardCommands {
         desc = "Copy the selection to the clipboard",
         help = "Copy the selection to the clipboard\n" +
                 "Flags:\n" +
-                "  -e controls whether entities are copied\n" +
+                "  -e excludes entities from being copied\n" +
                 "  -m sets a source mask so that excluded blocks become air\n" +
                 "WARNING: Pasting entities cannot yet be undone!",
         min = 0,
@@ -82,17 +83,23 @@ public class ClipboardCommands {
     )
     @CommandPermissions("worldedit.clipboard.copy")
     public void copy(Player player, LocalSession session, EditSession editSession,
-                     @Selection Region region, @Switch('e') boolean copyEntities,
+                     @Selection Region region, @Switch('e') boolean excludeEntities,
                      @Switch('m') Mask mask) throws WorldEditException {
+
+        boolean copyEntities = !excludeEntities;
 
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
         clipboard.setOrigin(session.getPlacementPosition(player));
         ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
+        copy.setCopyingEntities(copyEntities);
         if (mask != null) {
             copy.setSourceMask(mask);
         }
         Operations.completeLegacy(copy);
-        session.setClipboard(new ClipboardHolder(clipboard, editSession.getWorld().getWorldData()));
+
+        ClipboardHolder holder = new ClipboardHolder(clipboard, editSession.getWorld().getWorldData());
+        holder.setCopyingEntities(copyEntities);
+        session.setClipboard(holder);
 
         player.print(region.getArea() + " block(s) were copied.");
     }
@@ -104,7 +111,7 @@ public class ClipboardCommands {
         desc = "Cut the selection to the clipboard",
         help = "Copy the selection to the clipboard\n" +
                 "Flags:\n" +
-                "  -e controls whether entities are copied\n" +
+                "  -e excludes entities from being copied\n" +
                 "  -m sets a source mask so that excluded blocks become air\n" +
                 "WARNING: Cutting and pasting entities cannot yet be undone!",
         min = 0,
@@ -113,18 +120,24 @@ public class ClipboardCommands {
     @CommandPermissions("worldedit.clipboard.cut")
     @Logging(REGION)
     public void cut(Player player, LocalSession session, EditSession editSession,
-                    @Selection Region region, @Optional("air") Pattern leavePattern, @Switch('e') boolean copyEntities,
+                    @Selection Region region, @Optional("air") Pattern leavePattern, @Switch('e') boolean excludeEntities,
                     @Switch('m') Mask mask) throws WorldEditException {
+
+        boolean copyEntities = !excludeEntities;
 
         BlockArrayClipboard clipboard = new BlockArrayClipboard(region);
         clipboard.setOrigin(session.getPlacementPosition(player));
         ForwardExtentCopy copy = new ForwardExtentCopy(editSession, region, clipboard, region.getMinimumPoint());
         copy.setSourceFunction(new BlockReplace(editSession, leavePattern));
+        copy.setCopyingEntities(copyEntities);
         if (mask != null) {
             copy.setSourceMask(mask);
         }
         Operations.completeLegacy(copy);
-        session.setClipboard(new ClipboardHolder(clipboard, editSession.getWorld().getWorldData()));
+
+        ClipboardHolder holder = new ClipboardHolder(clipboard, editSession.getWorld().getWorldData());
+        holder.setCopyingEntities(copyEntities);
+        session.setClipboard(holder);
 
         player.print(region.getArea() + " block(s) were copied.");
     }
@@ -132,14 +145,15 @@ public class ClipboardCommands {
     @Command(
         aliases = { "/paste" },
         usage = "",
-        flags = "sao",
+        flags = "saoe",
         desc = "Paste the clipboard's contents",
         help =
             "Pastes the clipboard's contents.\n" +
             "Flags:\n" +
             "  -a skips air blocks\n" +
             "  -o pastes at the original position\n" +
-            "  -s selects the region after pasting",
+            "  -s selects the region after pasting\n" +
+            "  -e excludes entities from being pasted",
         min = 0,
         max = 0
     )
@@ -147,18 +161,23 @@ public class ClipboardCommands {
     @Logging(PLACEMENT)
     public void paste(Player player, LocalSession session, EditSession editSession,
                       @Switch('a') boolean ignoreAirBlocks, @Switch('o') boolean atOrigin,
-                      @Switch('s') boolean selectPasted) throws WorldEditException {
+                      @Switch('s') boolean selectPasted, @Switch('e') boolean excludeEntities) throws WorldEditException {
 
         ClipboardHolder holder = session.getClipboard();
         Clipboard clipboard = holder.getClipboard();
         Region region = clipboard.getRegion();
 
         Vector to = atOrigin ? clipboard.getOrigin() : session.getPlacementPosition(player);
-        Operation operation = holder
+        PasteBuilder builder = holder
                 .createPaste(editSession, editSession.getWorld().getWorldData())
                 .to(to)
-                .ignoreAirBlocks(ignoreAirBlocks)
-                .build();
+                .ignoreAirBlocks(ignoreAirBlocks);
+
+        if (excludeEntities) {
+            builder.copyEntities(false);
+        }
+
+        Operation operation = builder.build();
         Operations.completeLegacy(operation);
 
         if (selectPasted) {

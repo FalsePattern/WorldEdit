@@ -44,6 +44,7 @@ public class PasteBuilder {
 
     private Vector to = new Vector();
     private boolean ignoreAirBlocks;
+    private boolean copyEntities = true;
 
     /**
      * Create a new instance.
@@ -61,6 +62,7 @@ public class PasteBuilder {
         this.transform = holder.getTransform();
         this.targetExtent = targetExtent;
         this.targetWorldData = targetWorldData;
+        this.copyEntities = holder.isCopyingEntities();
     }
 
     /**
@@ -85,6 +87,17 @@ public class PasteBuilder {
     }
 
     /**
+     * Set whether to copy entities.
+     *
+     * @param copyEntities true to copy entities
+     * @return this builder instance
+     */
+    public PasteBuilder copyEntities(boolean copyEntities) {
+        this.copyEntities = copyEntities;
+        return this;
+    }
+
+    /**
      * Build the operation.
      *
      * @return the operation
@@ -93,6 +106,7 @@ public class PasteBuilder {
         BlockTransformExtent extent = new BlockTransformExtent(clipboard, transform, targetWorldData.getBlockRegistry(), targetWorldData.getBlockTransformHook());
         ForwardExtentCopy copy = new ForwardExtentCopy(extent, clipboard.getRegion(), clipboard.getOrigin(), targetExtent, to);
         copy.setTransform(transform);
+        copy.setCopyingEntities(copyEntities);
         if (ignoreAirBlocks) {
             copy.setSourceMask(new ExistingBlockMask(clipboard));
         }

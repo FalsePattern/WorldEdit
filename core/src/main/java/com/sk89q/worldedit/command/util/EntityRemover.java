@@ -101,6 +101,12 @@ public class EntityRemover {
             boolean matches(EntityType type) {
                 return type.isExperienceOrb();
             }
+        },
+        NPCS("npcs") {
+            @Override
+            boolean matches(EntityType type) {
+                return type.isNPC();
+            }
         };
 
         private final Pattern pattern;

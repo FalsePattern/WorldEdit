@@ -68,6 +68,7 @@ dependencies {
     devOnlyNonPublishable("codechicken:forgemultipart-mc1.7.10:1.6.2-mega:dev")
     devOnlyNonPublishable(deobfCurse("architecturecraft-242001:2352554"))
     devOnlyNonPublishable("mega:carpentersblocks-mc1.7.10:3.4.1-mega:dev")
+    devOnlyNonPublishable(deobfCurse("customnpcplus-480951:7074823"))
 
     runtimeOnlyNonPublishable("codechicken:notenoughitems-mc1.7.10:2.3.1-mega:dev")
 
